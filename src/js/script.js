@@ -4,6 +4,10 @@ const createRoomButton = document.querySelector("#create-room");
 const joinRoomButton = document.querySelector("#join-room");
 const gameMenu = document.querySelector("#game-menu");
 const roomList = document.querySelector("#rooms-list");
+const roomMenu = document.querySelector("#rooms-menu");
+roomMenu.style.display = "none";
+const quitRoomsMenu = document.querySelector("#quit-rooms-menu");
+
 const player = {
     host: false,
     roomId: null,
@@ -33,7 +37,13 @@ function joinRoom() {
     socket.emit('requestShowRoom', player);
 }
 
+function quitRoomPage() {
+    roomList.innerHTML = "";
+    roomMenu.style.display = "none";
+}
+
 socket.on('showRoom', (rooms) => {
+    roomMenu.style.display = "";
     const lenght = Object.keys(rooms).length;
     for(var i = 0; i < lenght; i++) {
         const nbPlayer = Object.keys(rooms[i].players).length;
@@ -44,8 +54,7 @@ socket.on('showRoom', (rooms) => {
 
 createRoomButton.addEventListener('click', createRoom);
 joinRoomButton.addEventListener('click', joinRoom);
-
-
+quitRoomsMenu.addEventListener('click', quitRoomPage);
 
 
 // const menu = document.getElementById("menu");
