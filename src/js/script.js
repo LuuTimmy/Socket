@@ -9,7 +9,6 @@ const player = {
     roomId: null,
     username: "",
     socketId: ""
-    //hero
 };
 
 function defineUsername(player) {
@@ -36,9 +35,10 @@ function joinRoom() {
 
 socket.on('showRoom', (rooms) => {
     const lenght = Object.keys(rooms).length;
-    for(var i = 0; i < 10; i++) {
-        console.log(i);
-
+    for(var i = 0; i < lenght; i++) {
+        const nbPlayer = Object.keys(rooms[i].players).length;
+        const addLi = `<li>RoomId = ${rooms[i].id}   ${nbPlayer}/${maxPlayer} <input type="button" value="JOIN" class="join-button"></li>`;
+        roomList.innerHTML += addLi;
     }
 });
 
