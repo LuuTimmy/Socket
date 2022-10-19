@@ -14,17 +14,31 @@
 				<input type="text" id="set-username" placeholder="Guest"><br>
                 <input type="button" value="Solo" id="Solo"><br>
                 <input type="button" value="Create Room" id="create-room"><br>
-				<input type="button" value="Join Room" id="join-room">
+				<input type="button" value="Join Room" id="display-rooms">
             </div>
         </div>
 		<div id="rooms-menu">
             <input type="button" value="X" id="quit-rooms-menu">
-			<ul id="rooms-list">
-				
-			</ul>
+			<ul id="rooms-list"></ul>
 		</div>
-        <div id="game">
+        <div id="in-room">
+            <input type="button" value="Play" id="launch-game">
+            <h3>PLAYERS</h3>
+            <ul id="players-in-room"></ul>
+        </div>
+        <div id="tchat">
+            <div id="tchat-text">
 
+            </div>
+            <form id="form-tchat">
+                <input type="text" id="tchat-text-type" placeholder="write message...">
+                <input type="submit" id="tchat-text-submit" hidden>
+            </form>
+        </div>
+        <div id="game">
+            <canvas id="main-screen"></canvas>
+            <div id="content-text"></div>
+            <input type="text" id="invisible-text">
         </div>
     </body>
     <script src="/socket.io/socket.io.js"></script>  

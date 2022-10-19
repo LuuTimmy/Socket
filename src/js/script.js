@@ -1,12 +1,26 @@
 const socket = io();
 const maxPlayer = 2;
 const createRoomButton = document.querySelector("#create-room");
-const joinRoomButton = document.querySelector("#join-room");
+const displayRoomsButton = document.querySelector("#display-rooms");
+const quitRoomsMenu = document.querySelector("#quit-rooms-menu");
 const gameMenu = document.querySelector("#game-menu");
 const roomList = document.querySelector("#rooms-list");
 const roomMenu = document.querySelector("#rooms-menu");
 roomMenu.style.display = "none";
-const quitRoomsMenu = document.querySelector("#quit-rooms-menu");
+
+const inRoom = document.querySelector("#in-room");
+const launchGame = inRoom.querySelector("#launch-game")
+const playersInRoom = inRoom.querySelector("#players-in-room");
+inRoom.style.display = "none";
+
+const tchat = document.querySelector("#tchat");
+const tchatText = tchat.querySelector("#tchat-text");
+const formTchat = document.querySelector("#form-tchat");
+tchat.style.display = "none";
+
+const playButton = inRoom.querySelector("#launch-game");
+const game = document.querySelector("#game");
+game.style.display = "none";
 
 const player = {
     host: false,
@@ -23,6 +37,10 @@ function defineUsername(player) {
         player.username = user;
 }
 
+socket.on('setRoomId', (roomId) => {
+    player.roomId = roomId;
+});
+
 function createRoom() {
     defineUsername(player);
     player.host = true;
@@ -30,31 +48,71 @@ function createRoom() {
     socket.emit('playerData', player);
 }
 
-function joinRoom() {
-    defineUsername(player);
-    player.host = false;
-    player.socketId = socket.id;
-    socket.emit('requestShowRoom', player);
+function displayRooms() {
+    socket.emit('requestShowRooms', player);
 }
 
-function quitRoomPage() {
+function joinRoom(roomId) {
+    defineUsername(player);
+    player.roomId = roomId;
+    player.host = false;
+    player.socketId = socket.id;
+    socket.emit('playerData', player);
+}
+
+function quitRoomsPage() {
     roomList.innerHTML = "";
     roomMenu.style.display = "none";
 }
 
-socket.on('showRoom', (rooms) => {
+socket.on('showRooms', (rooms) => {
     roomMenu.style.display = "";
+
     const lenght = Object.keys(rooms).length;
-    for(var i = 0; i < lenght; i++) {
-        const nbPlayer = Object.keys(rooms[i].players).length;
-        const addLi = `<li>RoomId = ${rooms[i].id}   ${nbPlayer}/${maxPlayer} <input type="button" value="JOIN" class="join-button"></li>`;
+    for (var i = 0; i < lenght; i++) {
+        const nbPlayer = rooms[i].players.length;
+        const addLi = `<li>${rooms[i].players[0].username} Room   ${nbPlayer}/${maxPlayer} 
+            <input type="button" value="JOIN" class="join-room-button" onclick="joinRoom('${String(rooms[i].id)}')"></li>`;
         roomList.innerHTML += addLi;
     }
 });
 
+socket.on('show your room', (room) => {
+    gameMenu.style.display = "none";
+    roomMenu.style.display = "none";
+    tchat.style.display = "";       //C MOCHE !!!
+    inRoom.style.display = "";
+    playersInRoom.innerHTML = "";
+    const lenght = Object.keys(room.players).length;
+    if (!player.host)
+        launchGame.style.display = "none";
+    for (var i = 0; i < lenght; i++) {
+        console.log(room);
+        const addLi = `<li>${room.players[i].username}</li>`;
+        playersInRoom.innerHTML += addLi;
+    }
+});
+
+socket.on('write in tchat', (playerUsername, valueText) => {
+    tchatText.innerHTML += `<p>${playerUsername} : ${valueText}</p>`;
+});
+
+socket.on('')
+
 createRoomButton.addEventListener('click', createRoom);
-joinRoomButton.addEventListener('click', joinRoom);
-quitRoomsMenu.addEventListener('click', quitRoomPage);
+displayRoomsButton.addEventListener('click', displayRooms);
+quitRoomsMenu.addEventListener('click', quitRoomsPage);
+formTchat.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const valueText = formTchat.querySelector('#tchat-text-type').value;
+    socket.emit('request tchat', player, valueText);
+    formTchat.querySelector('#tchat-text-type').value = "";
+});
+
+playButton.addEventListener('click', () => {
+    socket.emit('start game request', player);
+});
 
 
 // const menu = document.getElementById("menu");
